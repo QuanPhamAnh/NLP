@@ -21,6 +21,12 @@ function displayTree(tree) {
     return builder.join('');
 }
 
+function displayRow(obj) {
+    let row = JSON.parse(JSON.stringify(obj))
+    row.rhs.splice(row.dot, 0, '.')
+    return row.lhs + ' -> ' + row.rhs.join(' ') + ', ' + row.left
+}
+
 $('#txt').bind('input', function() {
     var s = $(this).val();
 
@@ -32,11 +38,19 @@ $('#txt').bind('input', function() {
 
     var rootProduction = 'S';
     var chart = tinynlp.parse(tokenStream, grammar, rootProduction);
-
+    $('#dv').empty();
+    for (var i = 0; i < chart.chart.length; i++) {
+    		$('#dv').append('Bảng T' + i + ': <br>')
+        for (var j = 0; j < chart.chart[i].length; j++) {
+        		if (chart.chart[i][j].lhs === chart.chart[i][j].lhs.toUpperCase()) {
+                $('#dv').append('- ' + displayRow(chart.chart[i][j]) + '<br>')
+            }
+        }
+    }
+    
     var state = chart.getFinishedRoot(rootProduction);
     if (state) {
         var trees = state.traverse();
-        $('#dv').empty();
         for (var i in trees) {
             console.log(JSON.stringify(trees[i]))
             $('#dv').append('<div class="tree" id="displayTree"><ul>' + displayTree(trees[i]) + '</ul></div></br>');
